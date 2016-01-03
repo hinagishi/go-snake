@@ -15,9 +15,27 @@ type Snake struct {
 	Dir int // 0: up 1: down 2: right 3: left
 }
 
+func drawMap() {
+	x, y := 5, 5
+	length := 40
+	bg := termbox.ColorRed
+
+	for i := 0; i < length; i++ {
+		termbox.SetCell(x, y+i, ' ', termbox.ColorDefault, bg)
+		termbox.SetCell(x+length, y+i, ' ', termbox.ColorDefault, bg)
+
+		if i == 0 || i == length-1 {
+			for j := 0; j < length; j++ {
+				termbox.SetCell(x+j, y+i, ' ', termbox.ColorDefault, bg)
+			}
+		}
+	}
+}
+
 func draw(s *Snake) {
 	for {
 		termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
+		drawMap()
 		for _, e := range s.Elm {
 			termbox.SetCell(e.X, e.Y, '@', termbox.ColorDefault, termbox.ColorDefault)
 		}
