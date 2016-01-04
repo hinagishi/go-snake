@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/nsf/termbox-go"
+	"math/rand"
 	"time"
 )
 
@@ -58,10 +59,45 @@ func drawMap() {
 	}
 }
 
+func initFeed() []Point {
+	feed := make([]Point, 0)
+	for i := 0; i < 5; i++ {
+		x, y := rand.Int()%fsize+fx+1, rand.Int()%fsize+fy+1
+		feed = append(feed, Point{x, y})
+	}
+	return feed
+}
+
+func drawFeed(feed []Point) {
+	for _, f := range feed {
+		termbox.SetCell(f.X, f.Y, '+', termbox.ColorDefault, termbox.ColorDefault)
+	}
+}
+
+func (snake *Snake) eatFeed(feed []Point) []Point {
+	head := snake.Elm[0]
+	for i, f := range feed {
+		if head.X == f.X && head.Y == f.Y {
+			tmp := []Point{}
+			for j, elm := range feed {
+				if i != j {
+					tmp = append(tmp, elm)
+				}
+			}
+			snake.grow()
+			tmp = append(tmp, Point{rand.Int()%fsize + fx, rand.Int()%fsize + fy})
+			return tmp
+		}
+	}
+	return feed
+}
+
 func draw(s *Snake) {
+	feed := initFeed()
 	for {
 		termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 		drawMap()
+		drawFeed(feed)
 		for _, e := range s.Elm {
 			termbox.SetCell(e.X, e.Y, '@', termbox.ColorDefault, termbox.ColorDefault)
 		}
@@ -69,9 +105,14 @@ func draw(s *Snake) {
 		if detectCollision(s) {
 			return
 		}
+		feed = s.eatFeed(feed)
 		time.Sleep(300 * time.Millisecond)
 		s.updatePos()
 	}
+}
+
+func (s *Snake) grow() {
+	s.Elm = append(s.Elm, s.Elm[len(s.Elm)-1])
 }
 
 func (s *Snake) updatePos() {
