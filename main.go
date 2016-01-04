@@ -5,28 +5,54 @@ import (
 	"time"
 )
 
+const (
+	fx    = 5
+	fy    = 5
+	fsize = 40
+)
+
+/*
+Point consists of a position (x, y) that is a body of snake
+*/
 type Point struct {
 	X int
 	Y int
 }
 
+/*
+Snake indicates a body of snake includes the positions and direction
+*/
 type Snake struct {
 	Elm []Point
 	Dir int // 0: up 1: down 2: right 3: left
 }
 
+func detectCollision(snake *Snake) bool {
+	head := snake.Elm[0]
+	if head.X == fx || head.X == fx+fsize {
+		return true
+	}
+	if head.Y == fy || head.Y == fy+fsize {
+		return true
+	}
+	for _, pos := range snake.Elm[1:] {
+		if head.X == pos.X && head.Y == pos.Y {
+			return true
+		}
+	}
+	return false
+}
+
 func drawMap() {
-	x, y := 5, 5
-	length := 40
 	bg := termbox.ColorRed
 
-	for i := 0; i < length; i++ {
-		termbox.SetCell(x, y+i, ' ', termbox.ColorDefault, bg)
-		termbox.SetCell(x+length, y+i, ' ', termbox.ColorDefault, bg)
+	for i := 0; i <= fsize; i++ {
+		termbox.SetCell(fx, fy+i, ' ', termbox.ColorDefault, bg)
+		termbox.SetCell(fx+fsize, fy+i, ' ', termbox.ColorDefault, bg)
 
-		if i == 0 || i == length-1 {
-			for j := 0; j < length; j++ {
-				termbox.SetCell(x+j, y+i, ' ', termbox.ColorDefault, bg)
+		if i == 0 || i == fsize {
+			for j := 1; j < fsize; j++ {
+				termbox.SetCell(fx+j, fy+i, ' ', termbox.ColorDefault, bg)
 			}
 		}
 	}
@@ -40,8 +66,11 @@ func draw(s *Snake) {
 			termbox.SetCell(e.X, e.Y, '@', termbox.ColorDefault, termbox.ColorDefault)
 		}
 		termbox.Flush()
-		s.updatePos()
+		if detectCollision(s) {
+			return
+		}
 		time.Sleep(300 * time.Millisecond)
+		s.updatePos()
 	}
 }
 
