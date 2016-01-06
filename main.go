@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+var start = true
+
 const (
 	fx    = 5
 	fy    = 5
@@ -103,6 +105,7 @@ func draw(s *Snake) {
 		}
 		termbox.Flush()
 		if detectCollision(s) {
+			start = true
 			return
 		}
 		feed = s.eatFeed(feed)
@@ -147,7 +150,6 @@ func main() {
 	defer termbox.Close()
 
 	snake := initSnake()
-	go draw(&snake)
 	for {
 		switch ev := termbox.PollEvent(); ev.Type {
 		case termbox.EventKey:
@@ -162,6 +164,12 @@ func main() {
 				snake.Dir = 2
 			case termbox.KeyArrowLeft:
 				snake.Dir = 3
+			case termbox.KeySpace:
+				if start {
+					start = false
+					snake = initSnake()
+					go draw(&snake)
+				}
 			}
 		}
 	}
