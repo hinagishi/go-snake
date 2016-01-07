@@ -11,7 +11,7 @@ var start = true
 const (
 	fx    = 5
 	fy    = 5
-	fsize = 40
+	fsize = 20
 )
 
 /*
@@ -54,7 +54,7 @@ func drawMap() {
 		termbox.SetCell(fx+fsize, fy+i, ' ', termbox.ColorDefault, bg)
 
 		if i == 0 || i == fsize {
-			for j := 1; j < fsize; j++ {
+			for j := 1; j <= fsize; j++ {
 				termbox.SetCell(fx+j, fy+i, ' ', termbox.ColorDefault, bg)
 			}
 		}
@@ -64,10 +64,18 @@ func drawMap() {
 func initFeed() []Point {
 	feed := make([]Point, 0)
 	for i := 0; i < 5; i++ {
-		x, y := rand.Int()%fsize+fx+1, rand.Int()%fsize+fy+1
-		feed = append(feed, Point{x, y})
+		feed = append(feed, createFeed())
 	}
 	return feed
+}
+
+func createFeed() Point {
+	for {
+		x, y := rand.Int()%fsize+fx, rand.Int()%fsize+fy
+		if x > fx && x < fsize+fx && y > fy && y < fsize+fy {
+			return Point{x, y}
+		}
+	}
 }
 
 func drawFeed(feed []Point) {
@@ -87,7 +95,7 @@ func (snake *Snake) eatFeed(feed []Point) []Point {
 				}
 			}
 			snake.grow()
-			tmp = append(tmp, Point{rand.Int()%fsize + fx, rand.Int()%fsize + fy})
+			tmp = append(tmp, createFeed())
 			return tmp
 		}
 	}
