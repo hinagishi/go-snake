@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/nsf/termbox-go"
 	"math/rand"
+	"strconv"
 	"time"
 )
 
@@ -26,8 +27,9 @@ type Point struct {
 Snake indicates a body of snake includes the positions and direction
 */
 type Snake struct {
-	Elm []Point
-	Dir int // 0: up 1: down 2: right 3: left
+	Elm   []Point
+	Dir   int // 0: up 1: down 2: right 3: left
+	Score int
 }
 
 func detectCollision(snake *Snake) bool {
@@ -78,6 +80,14 @@ func createFeed() Point {
 	}
 }
 
+func drawScore(snake *Snake) {
+	s := strconv.Itoa(snake.Score)
+	for i, c := range s {
+		termbox.SetCell(fx*2+fsize+i, fy*2, c, termbox.ColorDefault, termbox.ColorDefault)
+	}
+	termbox.Flush()
+}
+
 func drawFeed(feed []Point) {
 	for _, f := range feed {
 		termbox.SetCell(f.X, f.Y, '+', termbox.ColorDefault, termbox.ColorDefault)
@@ -96,6 +106,7 @@ func (snake *Snake) eatFeed(feed []Point) []Point {
 			}
 			snake.grow()
 			tmp = append(tmp, createFeed())
+			snake.Score += 5
 			return tmp
 		}
 	}
@@ -108,6 +119,7 @@ func draw(s *Snake) {
 		termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 		drawMap()
 		drawFeed(feed)
+		drawScore(s)
 		for _, e := range s.Elm {
 			termbox.SetCell(e.X, e.Y, '@', termbox.ColorDefault, termbox.ColorDefault)
 		}
@@ -148,6 +160,7 @@ func initSnake() Snake {
 	var s Snake
 	s.Elm = []Point{Point{20, 20}, Point{20, 19}, Point{20, 18}}
 	s.Dir = 1
+	s.Score = 0
 	return s
 }
 
