@@ -113,6 +113,7 @@ func draw(s *Snake) {
 		}
 		termbox.Flush()
 		if detectCollision(s) {
+			showNavigation()
 			start = true
 			return
 		}
@@ -150,6 +151,14 @@ func initSnake() Snake {
 	return s
 }
 
+func showNavigation() {
+	message := "<SPACE> start <ESC> exit"
+	for i, c := range message {
+		termbox.SetCell(fx+i, fsize+fy*2, c, termbox.ColorDefault, termbox.ColorDefault)
+	}
+	termbox.Flush()
+}
+
 func main() {
 	err := termbox.Init()
 	if err != nil {
@@ -157,6 +166,7 @@ func main() {
 	}
 	defer termbox.Close()
 
+	showNavigation()
 	snake := initSnake()
 	for {
 		switch ev := termbox.PollEvent(); ev.Type {
