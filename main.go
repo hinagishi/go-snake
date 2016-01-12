@@ -66,15 +66,20 @@ func drawMap() {
 func initFeed() []Point {
 	feed := make([]Point, 0)
 	for i := 0; i < 5; i++ {
-		feed = append(feed, createFeed())
+		feed = append(feed, createFeed(feed))
 	}
 	return feed
 }
 
-func createFeed() Point {
+func createFeed(feed []Point) Point {
 	for {
 		x, y := rand.Int()%fsize+fx, rand.Int()%fsize+fy
 		if x > fx && x < fsize+fx && y > fy && y < fsize+fy {
+			for _, p := range feed {
+				if p.X == x && p.Y == y {
+					continue
+				}
+			}
 			return Point{x, y}
 		}
 	}
@@ -105,7 +110,7 @@ func (snake *Snake) eatFeed(feed []Point) []Point {
 				}
 			}
 			snake.grow()
-			tmp = append(tmp, createFeed())
+			tmp = append(tmp, createFeed(feed))
 			snake.Score += 5
 			return tmp
 		}
